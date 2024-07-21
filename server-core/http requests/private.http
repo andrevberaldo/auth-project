@@ -1,2 +1,2 @@
-http://localhost:3000/private
+http://localhost:3000/api/private-data
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoie1wibmFtZVwiOlwiSm9oblwiLFwibGFzdE5hbWVcIjpcIkRvZVwiLFwicm9sZVwiOlwiVGVjaCBMZWFkXCJ9IiwiaWF0IjoxNzIwNDM3OTUxLCJleHAiOjE3MjA0MzgyNTF9.C7_8XWOWYGCQlPmNjw8ZYvWHLdTQ2JSne10iOSHv1e8

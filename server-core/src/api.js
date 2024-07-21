@@ -1,49 +1,48 @@
 const express = require('express')
-const AuthService = require('./services/auth')
+var cors = require('cors')
+const AuthService = require('./services/auth-service')
+const AuthMiddleware = require('./middlewares/auth');
+const UserRepository = require('./repositories/user-repository');
 
 const PORT = 3000
-
 const api = express()
 
-api.get('/', (req, res) => {
-    res.send('Public route')
-})
+api.use(cors())
 
-api.get('/login', (req, res) => {
-    const [login, password] = req.headers.authorization.split(':')
-
-    const isValidLogin = login === 'John' && password === '1234'    
-    const status = isValidLogin ? 200 : 401
-    const authBody = isValidLogin ? {
-        status: 'ok',
-        token: AuthService.createToken({ name: 'John', lastName: 'Doe', role: 'Tech Lead' })
-    } : { status: 'login or password invalid!' }
-
-    res.status(status).send(authBody)
-})
-
-api.get('/private', (req, res) => {
-    let status;
-    let body;
-    const [_, token] = req.headers.authorization.split(' ')
+api.get('/api/session/oauth', (req, res) => {
+    const credential = req.headers.authorization;
 
     try {
-        AuthService.validateToken(token)
-        status = 200
-        body = {
-            status: 'ok',
-            message: 'your are loged in!'
-        }
-    } catch(error) {        
-        status = 401
-        body = {
-            status: 'unauthorized',
-            message: error
-        }
-    } finally {
-        res.status(status).send(body)
+        const sistemCredentials = AuthService.exchangeToken(credential);
+        res.status(200).send(sistemCredentials)
+    } catch (error) {
+        res.status(404).send({ message: error })        
     }
 })
+
+api.get('/api/session', (req, res) => {
+    const credential = req.headers.authorization;
+
+    if(!credential) {
+        res.status(403).send({ message: 'Missing credentials' })
+    }
+
+    const [email, password] = credential.split(':');
+
+    try {
+        const user = UserRepository.findUser(email, password);
+        res.status(200).send({
+            ...user,
+            credential: AuthService.createToken(user)
+        })
+    } catch (error) {
+        res.status(404).send({ message: error })
+    }
+})
+
+api.get('/api/private-data', AuthMiddleware.isAuthorized, (_, res) => {
+    res.status(200).send('THIS IS A PRIVATE DATA, YOU ARE G2G');
+});
 
 api.listen(PORT, () => {
     console.log(`Server runing on ${PORT}`);

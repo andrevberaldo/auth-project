@@ -6,12 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/api.js",
-    "start:dev": "nodemon ./src/api.js localhost 3000"
+    "start:dev": "nodemon ./src/api.js localhost 3000",
+    "start:docker": "docker run -p 3000:3000 33f2cd7545a2"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "config": "3.3.12",
+    "cors": "^2.8.5",
     "express": "4.19.2",
     "jsonwebtoken": "9.0.2"
   },
